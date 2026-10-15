@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, HelpCircle } from 'lucide-react';
+import { ChevronDown, HelpCircle, Sparkle } from 'lucide-react';
 
 export const FAQSection: React.FC = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
@@ -28,44 +28,44 @@ export const FAQSection: React.FC = () => {
   ];
 
   return (
-    <section className="py-16 sm:py-20 bg-white border-b border-slate-200">
+    <section className="py-20 sm:py-24 bg-white border-b border-slate-200/80 relative">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-1.5 text-[#FF7A00] text-xs font-bold uppercase tracking-wider mb-1.5">
-            <HelpCircle className="w-3.5 h-3.5" />
-            <span>Got Questions?</span>
+        <div className="text-center mb-14">
+          <div className="inline-flex items-center gap-1.5 text-[#0071E3] text-xs font-semibold uppercase tracking-widest mb-2">
+            <Sparkle className="w-3.5 h-3.5" />
+            <span>Support &amp; Answers</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
             Frequently Asked Questions
           </h2>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+          <p className="text-sm text-slate-500 mt-1.5 font-normal">
             Everything you need to know about booking, guarantees, and service safety.
           </p>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-3.5">
           {faqs.map((faq, idx) => {
             const isOpen = openIndex === idx;
             return (
               <div
                 key={idx}
-                className="border border-slate-200 rounded-2xl overflow-hidden transition-all"
+                className="apple-card-3d bg-slate-50/60 rounded-2xl overflow-hidden transition-all border border-slate-200/70"
               >
                 <button
                   type="button"
                   onClick={() => setOpenIndex(isOpen ? null : idx)}
-                  className="w-full text-left px-5 py-4 flex items-center justify-between gap-4 bg-white hover:bg-slate-50 transition-colors cursor-pointer"
+                  className="w-full text-left px-6 py-4.5 flex items-center justify-between gap-4 bg-transparent hover:bg-slate-100/50 transition-colors cursor-pointer"
                 >
-                  <span className="font-semibold text-sm text-slate-900">{faq.q}</span>
+                  <span className="font-semibold text-sm sm:text-base text-slate-900 tracking-tight">{faq.q}</span>
                   <ChevronDown
-                    className={`w-4 h-4 text-slate-400 transition-transform ${
-                      isOpen ? 'rotate-180 text-[#FF7A00]' : ''
+                    className={`w-4 h-4 text-slate-400 transition-transform duration-300 ${
+                      isOpen ? 'rotate-180 text-[#0071E3]' : ''
                     }`}
                   />
                 </button>
                 {isOpen && (
-                  <div className="px-5 pb-5 text-xs text-slate-600 leading-relaxed bg-slate-50/50 border-t border-slate-100">
-                    <p className="pt-3">{faq.a}</p>
+                  <div className="px-6 pb-5 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-slate-100 bg-white/70">
+                    <p className="pt-3.5 font-normal">{faq.a}</p>
                   </div>
                 )}
               </div>

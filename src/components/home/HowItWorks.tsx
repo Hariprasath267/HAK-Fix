@@ -5,6 +5,7 @@ import {
   Search,
   CalendarCheck,
   ShieldCheck,
+  Sparkle,
 } from 'lucide-react';
 
 export const HowItWorks: React.FC = () => {
@@ -17,35 +18,36 @@ export const HowItWorks: React.FC = () => {
       title: t.step1Title,
       desc: t.step1Desc,
       icon: Search,
-      accent: 'from-blue-600 to-indigo-600',
+      accent: 'from-[#0071E3] to-[#2997FF]',
     },
     {
       num: '02',
       title: t.step2Title,
       desc: t.step2Desc,
       icon: CalendarCheck,
-      accent: 'from-orange-500 to-amber-600',
+      accent: 'from-indigo-600 to-sky-500',
     },
     {
       num: '03',
       title: t.step3Title,
       desc: t.step3Desc,
       icon: ShieldCheck,
-      accent: 'from-emerald-600 to-teal-600',
+      accent: 'from-emerald-500 to-teal-500',
     },
   ];
 
   return (
-    <section className="py-16 sm:py-20 bg-slate-50 border-b border-slate-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-2xl mx-auto mb-14">
-          <span className="text-[#0C2340] font-bold text-xs uppercase tracking-wider">
-            Simple 3-Step Process
-          </span>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mt-1">
+    <section className="py-20 sm:py-24 ambient-mesh-bg border-b border-slate-200/80 relative">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="text-center max-w-2xl mx-auto mb-16">
+          <div className="inline-flex items-center gap-1.5 text-[#0071E3] text-xs font-semibold uppercase tracking-widest mb-2">
+            <Sparkle className="w-3.5 h-3.5" />
+            <span>Seamless Experience</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
             {t.title}
           </h2>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">{t.subtitle}</p>
+          <p className="text-sm text-slate-500 mt-1.5 font-normal">{t.subtitle}</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
@@ -54,42 +56,42 @@ export const HowItWorks: React.FC = () => {
             return (
               <div
                 key={idx}
-                className="relative bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xs hover:shadow-lg transition-all"
+                className="apple-card-3d relative bg-white/85 backdrop-blur-xl rounded-[2rem] p-7 sm:p-8 border border-white/90"
               >
                 {/* Step number badge */}
-                <span className="text-4xl font-extrabold text-slate-100 select-none absolute top-6 right-6">
+                <span className="text-5xl font-black text-slate-100 select-none absolute top-6 right-6">
                   {step.num}
                 </span>
                 <div
-                  className={`w-12 h-12 rounded-2xl bg-gradient-to-tr ${step.accent} text-white flex items-center justify-center shadow-md mb-6`}
+                  className={`w-12 h-12 rounded-2xl bg-gradient-to-tr ${step.accent} text-white flex items-center justify-center shadow-lg shadow-blue-500/20 mb-6`}
                 >
                   <Icon className="w-6 h-6" />
                 </div>
-                <h3 className="text-lg font-bold text-slate-900 mb-2">{step.title}</h3>
-                <p className="text-xs text-slate-500 leading-relaxed">{step.desc}</p>
+                <h3 className="text-xl font-bold text-slate-900 mb-2 tracking-tight">{step.title}</h3>
+                <p className="text-xs sm:text-sm text-slate-500 leading-relaxed font-normal">{step.desc}</p>
               </div>
             );
           })}
         </div>
 
-        {/* Banner CTA */}
-        <div className="mt-12 rounded-3xl bg-gradient-to-r from-[#0C2340] via-[#102C52] to-[#0A1C33] p-6 sm:p-8 text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
+        {/* 3D Glass Banner CTA */}
+        <div className="mt-14 rounded-[2rem] apple-glass-dark p-7 sm:p-9 text-white flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="space-y-1 text-center md:text-left">
-            <h3 className="text-lg sm:text-xl font-bold">Have an immediate emergency repair?</h3>
-            <p className="text-xs text-slate-300">
+            <h3 className="text-xl sm:text-2xl font-bold tracking-tight">Have an immediate emergency repair?</h3>
+            <p className="text-xs sm:text-sm text-slate-300 font-normal">
               Our 30-minute express dispatch is ready for sparking wires, heavy tap leaks, and AC breakdowns.
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <button
               onClick={() => setIsAiFinderOpen(true)}
-              className="px-5 py-2.5 rounded-xl bg-[#FF7A00] hover:bg-[#e66e00] text-white font-bold text-xs transition-colors cursor-pointer shadow-md"
+              className="px-6 py-3 rounded-full apple-btn-3d text-white font-semibold text-xs cursor-pointer shadow-md"
             >
               Ask AI Problem Finder
             </button>
             <button
               onClick={() => setCurrentPage('services')}
-              className="px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs border border-white/20 transition-colors cursor-pointer"
+              className="px-6 py-3 rounded-full bg-white/10 hover:bg-white/15 text-white font-semibold text-xs border border-white/15 transition-all cursor-pointer"
             >
               Explore All Categories
             </button>

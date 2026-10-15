@@ -6,10 +6,11 @@ import {
   IndianRupee,
   Calendar,
   Send,
+  ArrowLeft,
 } from 'lucide-react';
 
 export const BecomeProviderPage: React.FC = () => {
-  const { showToast, setUserRole, setCurrentPage } = useApp();
+  const { showToast, setUserRole, setCurrentPage, goBack, getBackTitle } = useApp();
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [category, setCategory] = useState('electrical');
@@ -28,10 +29,22 @@ export const BecomeProviderPage: React.FC = () => {
   };
 
   return (
-    <div className="bg-slate-50 min-h-screen py-12">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+    <div className="bg-slate-50 min-h-screen py-10 sm:py-14 subtle-photo-backdrop">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 relative z-10">
+        {/* Back navigation */}
+        <div>
+          <button
+            onClick={goBack}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 hover:bg-white text-slate-700 hover:text-slate-900 text-xs font-semibold border border-slate-200/80 shadow-xs transition-all active:scale-95 cursor-pointer"
+          >
+            <ArrowLeft className="w-4 h-4 text-[#0071E3]" />
+            <span>{getBackTitle()}</span>
+          </button>
+        </div>
+
         <div className="text-center max-w-2xl mx-auto space-y-2">
-          <span className="text-[#FF7A00] font-bold text-xs uppercase tracking-wider">
+          <span className="text-[#0071E3] font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5">
+            <ShieldCheck className="w-4 h-4 text-emerald-600" />
             Partner with HAK fix
           </span>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
@@ -44,7 +57,7 @@ export const BecomeProviderPage: React.FC = () => {
 
         {/* Benefits Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs">
+          <div className="bg-white/95 p-6 rounded-3xl border border-slate-200 shadow-sm">
             <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center mb-3">
               <IndianRupee className="w-5 h-5" />
             </div>
@@ -53,8 +66,8 @@ export const BecomeProviderPage: React.FC = () => {
               Top technicians earn predictable income with transparent per-job billing and zero commission on repeat client tips.
             </p>
           </div>
-          <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs">
-            <div className="w-10 h-10 rounded-xl bg-orange-100 text-[#FF7A00] flex items-center justify-center mb-3">
+          <div className="bg-white/95 p-6 rounded-3xl border border-slate-200 shadow-sm">
+            <div className="w-10 h-10 rounded-xl bg-blue-100 text-[#0071E3] flex items-center justify-center mb-3">
               <Calendar className="w-5 h-5" />
             </div>
             <h3 className="font-bold text-sm text-slate-900">Flexible Work Schedule</h3>
@@ -62,7 +75,7 @@ export const BecomeProviderPage: React.FC = () => {
               You are in control. Switch your status online or offline anytime directly from the Provider Dashboard.
             </p>
           </div>
-          <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs">
+          <div className="bg-white/95 p-6 rounded-3xl border border-slate-200 shadow-sm">
             <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center mb-3">
               <ShieldCheck className="w-5 h-5" />
             </div>
@@ -168,9 +181,9 @@ export const BecomeProviderPage: React.FC = () => {
               <div className="pt-2">
                 <button
                   type="submit"
-                  className="w-full sm:w-auto px-6 py-3 rounded-xl bg-[#FF7A00] hover:bg-[#e66e00] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md cursor-pointer"
+                  className="w-full sm:w-auto px-6 py-3 rounded-full apple-btn-3d text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md cursor-pointer"
                 >
-                  <Send className="w-3.5 h-3.5" />
+                  <Send className="w-3.5 h-3.5 text-white" />
                   <span>Submit Partner Application</span>
                 </button>
               </div>

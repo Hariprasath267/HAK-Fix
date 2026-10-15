@@ -14,6 +14,7 @@ import {
   ToggleRight,
   TrendingUp,
   ShieldCheck,
+  ArrowLeft,
 } from 'lucide-react';
 
 export const ProviderDashboard: React.FC = () => {
@@ -23,6 +24,8 @@ export const ProviderDashboard: React.FC = () => {
     updateBookingStatus,
     toggleProviderAvailability,
     language,
+    goBack,
+    getBackTitle,
   } = useApp();
 
   // Current logged in provider (Suresh Kumar, pro-1 for demo)
@@ -63,7 +66,18 @@ export const ProviderDashboard: React.FC = () => {
 
   return (
     <div className="bg-slate-50 min-h-screen py-8 sm:py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        {/* Back navigation */}
+        <div>
+          <button
+            onClick={goBack}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 text-xs font-semibold border border-slate-200/80 shadow-xs transition-all active:scale-95 cursor-pointer"
+          >
+            <ArrowLeft className="w-4 h-4 text-[#0071E3]" />
+            <span>{getBackTitle()}</span>
+          </button>
+        </div>
+
         {/* Provider Profile Header */}
         <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="flex items-center gap-4">
@@ -82,7 +96,7 @@ export const ProviderDashboard: React.FC = () => {
                   Verified Partner
                 </span>
               </div>
-              <div className="text-xs font-semibold text-[#FF7A00] mt-0.5">
+              <div className="text-xs font-semibold text-[#0071E3] mt-0.5">
                 {currentProvider.categoryName} &bull; {currentProvider.city} Hub
               </div>
               <div className="flex items-center gap-3 text-xs text-slate-500 mt-1">
@@ -106,7 +120,7 @@ export const ProviderDashboard: React.FC = () => {
             </div>
             <button
               onClick={() => toggleProviderAvailability(currentProvider.id)}
-              className="text-[#FF7A00] hover:text-[#e66e00] transition-colors cursor-pointer"
+              className="text-[#0071E3] hover:text-blue-700 transition-colors cursor-pointer"
               title="Toggle Online/Offline"
             >
               {currentProvider.availabilityToday ? (
@@ -147,7 +161,7 @@ export const ProviderDashboard: React.FC = () => {
           </div>
 
           <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-xs">
-            <div className="w-10 h-10 rounded-xl bg-orange-50 text-[#FF7A00] flex items-center justify-center mb-3">
+            <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#0071E3] flex items-center justify-center mb-3">
               <Clock className="w-5 h-5" />
             </div>
             <span className="text-[11px] uppercase font-bold text-slate-400 tracking-wider">
@@ -156,7 +170,7 @@ export const ProviderDashboard: React.FC = () => {
             <div className="text-xl sm:text-2xl font-extrabold text-slate-900 mt-0.5">
               {incomingRequests.length}
             </div>
-            <span className="text-[10px] text-orange-600 font-medium">Pending acceptance</span>
+            <span className="text-[10px] text-blue-600 font-medium">Pending acceptance</span>
           </div>
 
           <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-xs">
@@ -202,14 +216,14 @@ export const ProviderDashboard: React.FC = () => {
               incomingRequests.map((bkg) => (
                 <div
                   key={bkg.id}
-                  className="bg-white rounded-3xl p-6 border-2 border-orange-300 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6"
+                  className="bg-white rounded-3xl p-6 border-2 border-blue-300 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6"
                 >
                   <div className="space-y-2 flex-1">
                     <div className="flex items-center gap-2">
                       <span className="font-mono text-xs font-bold px-2.5 py-0.5 rounded-lg bg-slate-100 text-slate-800">
                         {bkg.referenceId}
                       </span>
-                      <span className="px-2 py-0.5 rounded-full bg-orange-100 text-[#FF7A00] text-xs font-bold">
+                      <span className="px-2 py-0.5 rounded-full bg-blue-100 text-[#0071E3] text-xs font-bold">
                         New Request
                       </span>
                     </div>

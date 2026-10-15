@@ -11,10 +11,10 @@ import {
   Eye,
   CheckCircle2,
   AlertTriangle,
-  ChevronRight,
-  ShieldCheck,
   User,
   Plus,
+  ShieldCheck,
+  ArrowLeft,
 } from 'lucide-react';
 
 export const CustomerDashboard: React.FC = () => {
@@ -26,6 +26,8 @@ export const CustomerDashboard: React.FC = () => {
     cancelBooking,
     submitReview,
     setIsBookingModalOpen,
+    goBack,
+    getBackTitle,
   } = useApp();
 
   const [activeTab, setActiveTab] = useState<BookingStatus | 'all'>('all');
@@ -58,53 +60,68 @@ export const CustomerDashboard: React.FC = () => {
   const getStatusBadge = (status: BookingStatus) => {
     switch (status) {
       case 'pending':
-        return 'bg-amber-100 text-amber-800 border-amber-300';
+        return 'bg-amber-500/10 text-amber-700 border-amber-500/25 shadow-xs';
       case 'accepted':
-        return 'bg-blue-100 text-blue-800 border-blue-300';
+        return 'bg-blue-500/10 text-[#0071E3] border-blue-500/25 shadow-xs';
       case 'on_the_way':
-        return 'bg-purple-100 text-purple-800 border-purple-300';
+        return 'bg-purple-500/10 text-purple-700 border-purple-500/25 shadow-xs';
       case 'in_progress':
-        return 'bg-indigo-100 text-indigo-800 border-indigo-300 animate-pulse';
+        return 'bg-indigo-500/10 text-indigo-700 border-indigo-500/25 shadow-xs animate-pulse';
       case 'completed':
-        return 'bg-emerald-100 text-emerald-800 border-emerald-300';
+        return 'bg-emerald-500/10 text-emerald-700 border-emerald-500/25 shadow-xs';
       case 'cancelled':
-        return 'bg-rose-100 text-rose-800 border-rose-300';
+        return 'bg-rose-500/10 text-rose-700 border-rose-500/25 shadow-xs';
       default:
-        return 'bg-slate-100 text-slate-800 border-slate-300';
+        return 'bg-slate-100 text-slate-700 border-slate-200';
     }
   };
 
   return (
-    <div className="bg-slate-50 min-h-screen py-8 sm:py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        {/* Welcome Banner */}
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="ambient-mesh-bg min-h-screen py-10 sm:py-16 relative">
+      {/* Decorative ambient blurred orb */}
+      <div className="absolute top-10 right-10 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-20 left-10 w-96 h-96 bg-indigo-400/10 rounded-full blur-3xl pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 relative z-10">
+        {/* Back navigation */}
+        <div>
+          <button
+            onClick={goBack}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 hover:bg-white text-slate-700 hover:text-slate-900 text-xs font-semibold border border-slate-200/80 shadow-xs transition-all active:scale-95 cursor-pointer"
+          >
+            <ArrowLeft className="w-4 h-4 text-[#0071E3]" />
+            <span>{getBackTitle()}</span>
+          </button>
+        </div>
+
+        {/* Apple-style Elevated Header */}
+        <div className="apple-glass rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-[#0C2340] text-white flex items-center justify-center font-bold text-xl shadow-md">
-              <User className="w-7 h-7 text-[#FF7A00]" />
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#0C2340] to-[#1E3A8A] text-white flex items-center justify-center font-bold text-xl shadow-[0_8px_16px_rgba(12,35,64,0.25)]">
+              <User className="w-7 h-7 text-[#2997FF]" />
             </div>
             <div>
-              <span className="text-xs font-bold uppercase tracking-wider text-[#FF7A00]">
-                Customer Dashboard
+              <span className="text-[11px] font-semibold uppercase tracking-widest text-[#0071E3]">
+                Customer Account
               </span>
-              <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900">
-                Welcome back, {currentUser.name}!
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+                {currentUser.name}
               </h1>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Manage your appointments, track real-time technician arrival, and view warranty history.
+              <p className="text-xs sm:text-sm text-slate-500 mt-0.5 font-normal">
+                Manage your appointments, track real-time arrival, and view 30-day warranty history.
               </p>
             </div>
           </div>
           <button
             onClick={() => setIsBookingModalOpen(true)}
-            className="self-start md:self-auto px-4 py-2.5 rounded-xl bg-[#FF7A00] hover:bg-[#e66e00] text-white font-semibold text-xs flex items-center gap-2 shadow-md shadow-orange-500/20 cursor-pointer"
+            className="self-start md:self-auto px-5 py-2.5 rounded-full apple-btn-3d text-white font-semibold text-xs flex items-center gap-2 cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>Book New Service</span>
           </button>
         </div>
 
-        {/* Tab Filters */}
+        {/* Apple-style Filter Pill Tabs */}
         <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
           {[
             { id: 'all', label: 'All Bookings' },
@@ -118,10 +135,10 @@ export const CustomerDashboard: React.FC = () => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`px-4 py-2 rounded-2xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+              className={`px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all cursor-pointer ${
                 activeTab === tab.id
-                  ? 'bg-[#0C2340] text-white shadow-sm'
-                  : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                  ? 'bg-slate-900 text-white shadow-md font-semibold'
+                  : 'bg-white/80 hover:bg-white text-slate-600 border border-slate-200/80 shadow-xs'
               }`}
             >
               {tab.label}
@@ -134,7 +151,7 @@ export const CustomerDashboard: React.FC = () => {
           ))}
         </div>
 
-        {/* Bookings List */}
+        {/* Bookings List - Transformed with Apple 3D depth */}
         {filteredBookings.length > 0 ? (
           <div className="space-y-4">
             {filteredBookings.map((bkg) => {
@@ -142,34 +159,36 @@ export const CustomerDashboard: React.FC = () => {
               return (
                 <div
                   key={bkg.id}
-                  className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200 shadow-xs hover:shadow-md transition-all flex flex-col md:flex-row md:items-center justify-between gap-6"
+                  className="apple-card-3d bg-white/85 backdrop-blur-xl rounded-[2rem] p-6 sm:p-7 border border-white/90 flex flex-col md:flex-row md:items-center justify-between gap-6"
                 >
                   {/* Left: Booking Details */}
-                  <div className="space-y-3 flex-1">
+                  <div className="space-y-3.5 flex-1">
                     <div className="flex flex-wrap items-center gap-2.5">
-                      <span className="px-3 py-1 rounded-xl font-mono text-xs font-bold bg-slate-100 text-slate-800 border border-slate-200">
+                      <span className="px-3 py-1 rounded-xl font-mono text-xs font-semibold bg-slate-100/90 text-slate-700 border border-slate-200/60 shadow-inner">
                         {bkg.referenceId}
                       </span>
                       <span
-                        className={`px-2.5 py-0.5 rounded-full text-xs font-bold border ${getStatusBadge(
+                        className={`px-3 py-0.5 rounded-full text-xs font-semibold border ${getStatusBadge(
                           bkg.status
                         )}`}
                       >
                         {getStatusLabel(bkg.status, language)}
                       </span>
-                      <span className="text-xs text-[#FF7A00] font-semibold">
+                      <span className="text-xs text-[#0071E3] font-semibold capitalize">
                         {getCategoryName(bkg.category, language)}
                       </span>
                     </div>
 
                     <div>
-                      <h3 className="font-bold text-base text-slate-900">{bkg.serviceName}</h3>
-                      <p className="text-xs text-slate-500 mt-0.5 line-clamp-1">
+                      <h3 className="font-bold text-lg text-slate-900 tracking-tight">
+                        {bkg.serviceName}
+                      </h3>
+                      <p className="text-xs sm:text-sm text-slate-500 mt-0.5 line-clamp-1 font-normal">
                         Problem: {bkg.problemDescription}
                       </p>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs text-slate-600 pt-1">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-slate-600 pt-1">
                       <div className="flex items-center gap-1.5">
                         <Calendar className="w-3.5 h-3.5 text-slate-400" />
                         <span>
@@ -189,39 +208,39 @@ export const CustomerDashboard: React.FC = () => {
                     </div>
 
                     {bkg.cancellationReason && (
-                      <div className="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-800">
+                      <div className="p-3 rounded-2xl bg-rose-50/70 border border-rose-200/70 text-xs text-rose-800">
                         <strong>Cancelled Reason:</strong> {bkg.cancellationReason}
                       </div>
                     )}
 
                     {bkg.review && (
-                      <div className="p-3 rounded-xl bg-amber-50/70 border border-amber-200 text-xs text-amber-950">
+                      <div className="p-3.5 rounded-2xl bg-amber-50/60 border border-amber-200/60 text-xs text-amber-950">
                         <div className="flex items-center gap-1 text-amber-500 font-bold mb-0.5">
                           {[...Array(bkg.review.rating)].map((_, i) => (
-                            <Star key={i} className="w-3 h-3 fill-current" />
+                            <Star key={i} className="w-3.5 h-3.5 fill-current" />
                           ))}
-                          <span className="text-[11px] text-amber-900 ml-1">Your Verified Review:</span>
+                          <span className="text-[11px] text-amber-900 ml-1 font-medium">Your Verified Review:</span>
                         </div>
                         <p className="italic">"{bkg.review.comment}"</p>
                       </div>
                     )}
                   </div>
 
-                  {/* Right: Pricing & Actions */}
-                  <div className="flex flex-col sm:flex-row md:flex-col items-start sm:items-center md:items-end justify-between gap-3 pt-3 md:pt-0 border-t md:border-t-0 border-slate-100 shrink-0">
+                  {/* Right: Pricing & 3D Tactile Actions */}
+                  <div className="flex flex-col sm:flex-row md:flex-col items-start sm:items-center md:items-end justify-between gap-4 pt-3 md:pt-0 border-t md:border-t-0 border-slate-100 shrink-0">
                     <div className="text-left md:text-right">
-                      <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider block">
+                      <span className="text-[10px] text-slate-400 uppercase font-semibold tracking-wider block">
                         Estimated Total (INR)
                       </span>
-                      <span className="text-xl font-extrabold text-slate-900">
+                      <span className="text-2xl font-extrabold text-slate-900 tracking-tight">
                         ₹{bkg.totalPrice}
                       </span>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2.5">
                       <button
                         onClick={() => openBookingTracking(bkg.id)}
-                        className="px-3.5 py-1.5 rounded-xl bg-[#0C2340] hover:bg-[#102C52] text-white text-xs font-bold shadow-xs transition-colors flex items-center gap-1 cursor-pointer"
+                        className="px-4 py-2 rounded-full apple-btn-3d text-white text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
                       >
                         <Eye className="w-3.5 h-3.5" />
                         <span>Track Status</span>
@@ -230,7 +249,7 @@ export const CustomerDashboard: React.FC = () => {
                       {cancelCheck.allowed && (
                         <button
                           onClick={() => setCancelModalBookingId(bkg.id)}
-                          className="px-3 py-1.5 rounded-xl border border-rose-200 hover:bg-rose-50 text-rose-600 text-xs font-semibold transition-colors cursor-pointer"
+                          className="px-4 py-2 rounded-full bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 text-xs font-semibold border border-slate-200/80 transition-all cursor-pointer"
                         >
                           Cancel
                         </button>
@@ -239,7 +258,7 @@ export const CustomerDashboard: React.FC = () => {
                       {bkg.status === 'completed' && !bkg.review && (
                         <button
                           onClick={() => setReviewModalBookingId(bkg.id)}
-                          className="px-3 py-1.5 rounded-xl bg-orange-50 hover:bg-orange-100 border border-orange-300 text-[#FF7A00] text-xs font-bold transition-colors flex items-center gap-1 cursor-pointer"
+                          className="px-4 py-2 rounded-full bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-900 text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
                         >
                           <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
                           <span>Leave Review</span>
@@ -252,8 +271,8 @@ export const CustomerDashboard: React.FC = () => {
             })}
           </div>
         ) : (
-          <div className="bg-white rounded-3xl p-12 text-center border border-slate-200 space-y-4">
-            <div className="w-16 h-16 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
+          <div className="apple-glass rounded-[2rem] p-12 text-center border border-white/80 space-y-4">
+            <div className="w-16 h-16 rounded-2xl bg-blue-50 text-[#0071E3] flex items-center justify-center mx-auto shadow-inner">
               <Calendar className="w-8 h-8" />
             </div>
             <div>
@@ -265,7 +284,7 @@ export const CustomerDashboard: React.FC = () => {
             </div>
             <button
               onClick={() => setIsBookingModalOpen(true)}
-              className="px-4 py-2 rounded-xl bg-[#FF7A00] text-white text-xs font-semibold shadow-md cursor-pointer"
+              className="px-5 py-2.5 rounded-full apple-btn-3d text-white text-xs font-semibold shadow-md cursor-pointer"
             >
               Book a Service Now
             </button>
@@ -274,17 +293,17 @@ export const CustomerDashboard: React.FC = () => {
 
         {/* Cancellation Reason Modal */}
         {cancelModalBookingId && (
-          <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-white rounded-3xl p-6 max-w-md w-full border border-slate-200 shadow-xl space-y-4">
-              <h3 className="font-bold text-base text-slate-900">Cancel Appointment</h3>
-              <p className="text-xs text-slate-500">
+          <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in">
+            <div className="bg-white rounded-3xl p-6 sm:p-7 max-w-md w-full border border-slate-200/80 shadow-2xl space-y-4">
+              <h3 className="font-bold text-lg text-slate-900 tracking-tight">Cancel Appointment</h3>
+              <p className="text-xs text-slate-500 leading-relaxed">
                 Please select the reason for cancelling this booking. Free cancellation applies while
                 in pending or accepted status.
               </p>
               <select
                 value={cancelReason}
                 onChange={(e) => setCancelReason(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs text-slate-800"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs text-slate-800 bg-white"
               >
                 <option value="Change of personal schedule">Change of personal schedule</option>
                 <option value="Issue resolved by self">Issue resolved by self</option>
@@ -292,16 +311,16 @@ export const CustomerDashboard: React.FC = () => {
                 <option value="Emergency resolved">Emergency resolved</option>
                 <option value="Price concerns">Price concerns</option>
               </select>
-              <div className="flex items-center justify-end gap-2 pt-2">
+              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
                 <button
                   onClick={() => setCancelModalBookingId(null)}
-                  className="px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer"
+                  className="px-4 py-2 rounded-full border border-slate-200 text-xs font-medium text-slate-600 hover:bg-slate-50 cursor-pointer"
                 >
                   Keep Booking
                 </button>
                 <button
                   onClick={handleCancelSubmit}
-                  className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md cursor-pointer"
+                  className="px-4 py-2 rounded-full bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold shadow-md cursor-pointer"
                 >
                   Confirm Cancellation
                 </button>
@@ -312,9 +331,9 @@ export const CustomerDashboard: React.FC = () => {
 
         {/* Rating & Review Modal */}
         {reviewModalBookingId && (
-          <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-white rounded-3xl p-6 max-w-md w-full border border-slate-200 shadow-xl space-y-4">
-              <h3 className="font-bold text-base text-slate-900">Rate &amp; Review Technician</h3>
+          <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in">
+            <div className="bg-white rounded-3xl p-6 sm:p-7 max-w-md w-full border border-slate-200/80 shadow-2xl space-y-4">
+              <h3 className="font-bold text-lg text-slate-900 tracking-tight">Rate &amp; Review Technician</h3>
               <p className="text-xs text-slate-500">
                 Your feedback helps the community discover trustworthy local service providers.
               </p>
@@ -347,20 +366,20 @@ export const CustomerDashboard: React.FC = () => {
                   onChange={(e) => setReviewComment(e.target.value)}
                   placeholder="Tell us about the technician's punctuality, skill, cleanliness, and price transparency..."
                   rows={3}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs text-slate-900"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs text-slate-900"
                 />
               </div>
-              <div className="flex items-center justify-end gap-2 pt-2">
+              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
                 <button
                   onClick={() => setReviewModalBookingId(null)}
-                  className="px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer"
+                  className="px-4 py-2 rounded-full border border-slate-200 text-xs font-medium text-slate-600 hover:bg-slate-50 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleReviewSubmit}
                   disabled={!reviewComment.trim()}
-                  className="px-4 py-2 rounded-xl bg-[#FF7A00] hover:bg-[#e66e00] disabled:opacity-50 text-white text-xs font-bold shadow-md cursor-pointer"
+                  className="px-5 py-2 rounded-full apple-btn-3d disabled:opacity-50 text-white text-xs font-semibold shadow-md cursor-pointer"
                 >
                   Submit Verified Review
                 </button>

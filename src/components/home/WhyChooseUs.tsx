@@ -6,6 +6,7 @@ import {
   ThumbsUp,
   Award,
   Headphones,
+  Sparkle,
 } from 'lucide-react';
 
 export const WhyChooseUs: React.FC = () => {
@@ -43,33 +44,34 @@ export const WhyChooseUs: React.FC = () => {
   ];
 
   return (
-    <section className="py-16 sm:py-20 bg-white border-b border-slate-200">
+    <section className="py-20 sm:py-24 bg-white border-b border-slate-200/80 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-2xl mx-auto mb-14">
-          <span className="text-[#FF7A00] font-bold text-xs uppercase tracking-wider">
-            Why Choose HAK fix
-          </span>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mt-1">
+        <div className="text-center max-w-2xl mx-auto mb-16">
+          <div className="inline-flex items-center gap-1.5 text-[#0071E3] text-xs font-semibold uppercase tracking-widest mb-2">
+            <Sparkle className="w-3.5 h-3.5" />
+            <span>Platform Assurance</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
             Setting the Benchmark for On-Demand Home Services
           </h2>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+          <p className="text-sm text-slate-500 mt-1.5 font-normal leading-relaxed">
             We eliminate the anxiety of finding reliable tradesmen with standardized quality controls.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
           {benefits.map((b, idx) => {
             const Icon = b.icon;
             return (
               <div
                 key={idx}
-                className="p-6 rounded-3xl bg-slate-50/70 border border-slate-200/80 hover:bg-white hover:shadow-lg transition-all"
+                className="apple-card-3d p-7 rounded-[2rem] bg-slate-50/70 hover:bg-white border border-slate-200/70"
               >
-                <div className="w-12 h-12 rounded-2xl bg-orange-50 text-[#FF7A00] flex items-center justify-center mb-4">
+                <div className="w-12 h-12 rounded-2xl bg-blue-50 text-[#0071E3] flex items-center justify-center mb-5 shadow-xs">
                   <Icon className="w-6 h-6" />
                 </div>
-                <h3 className="font-bold text-base text-slate-900 mb-2">{b.title}</h3>
-                <p className="text-xs text-slate-600 leading-relaxed">{b.desc}</p>
+                <h3 className="font-bold text-lg text-slate-900 mb-2 tracking-tight">{b.title}</h3>
+                <p className="text-xs sm:text-sm text-slate-500 leading-relaxed font-normal">{b.desc}</p>
               </div>
             );
           })}

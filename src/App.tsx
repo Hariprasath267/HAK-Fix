@@ -19,6 +19,7 @@ import { HowItWorksPage } from './components/pages/HowItWorksPage.tsx';
 import { BecomeProviderPage } from './components/pages/BecomeProviderPage.tsx';
 import { BookingFlowModal } from './components/booking/BookingFlowModal.tsx';
 import { AIServiceFinderModal } from './components/ai/AIServiceFinderModal.tsx';
+import { FairFixModal } from './components/fairfix/FairFixModal.tsx';
 import { AuthModal } from './components/auth/AuthModal.tsx';
 import { ToastContainer } from './components/common/ToastContainer.tsx';
 
@@ -26,7 +27,7 @@ const MainRouter: React.FC = () => {
   const { currentPage } = useApp();
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F8FAFC] text-slate-900 font-sans antialiased selection:bg-[#FF7A00] selection:text-white">
+    <div className="min-h-screen flex flex-col bg-[#F8FAFC] text-slate-900 font-sans antialiased selection:bg-[#0071E3] selection:text-white">
       {/* Top Navigation with Brand Logo */}
       <Navbar />
 
@@ -58,6 +59,7 @@ const MainRouter: React.FC = () => {
       {/* Global Modals & Notifications */}
       <BookingFlowModal />
       <AIServiceFinderModal />
+      <FairFixModal />
       <AuthModal />
       <ToastContainer />
 

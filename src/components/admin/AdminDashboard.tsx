@@ -8,6 +8,7 @@ import {
   FileText,
   AlertTriangle,
   Lock,
+  ArrowLeft,
 } from 'lucide-react';
 
 export const AdminDashboard: React.FC = () => {
@@ -20,6 +21,8 @@ export const AdminDashboard: React.FC = () => {
     toggleProviderVerification,
     openBookingTracking,
     showToast,
+    goBack,
+    getBackTitle,
   } = useApp();
 
   const [activeAdminTab, setActiveAdminTab] = useState<
@@ -38,12 +41,21 @@ export const AdminDashboard: React.FC = () => {
           This portal requires administrator privileges. For evaluation, you can switch
           personas via the button below or the top navigation bar.
         </p>
-        <button
-          onClick={() => setUserRole('admin')}
-          className="mt-4 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md cursor-pointer"
-        >
-          Elevate Persona to Administrator
-        </button>
+        <div className="flex items-center gap-3 mt-4">
+          <button
+            onClick={goBack}
+            className="px-4 py-2 rounded-xl bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1.5"
+          >
+            <ArrowLeft className="w-3.5 h-3.5 text-[#0071E3]" />
+            <span>{getBackTitle()}</span>
+          </button>
+          <button
+            onClick={() => setUserRole('admin')}
+            className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md cursor-pointer"
+          >
+            Elevate Persona to Administrator
+          </button>
+        </div>
       </div>
     );
   }
@@ -75,7 +87,18 @@ export const AdminDashboard: React.FC = () => {
 
   return (
     <div className="bg-slate-50 min-h-screen py-8 sm:py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        {/* Back navigation */}
+        <div>
+          <button
+            onClick={goBack}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 text-xs font-semibold border border-slate-200/80 shadow-xs transition-all active:scale-95 cursor-pointer"
+          >
+            <ArrowLeft className="w-4 h-4 text-[#0071E3]" />
+            <span>{getBackTitle()}</span>
+          </button>
+        </div>
+
         {/* Admin Header */}
         <div className="bg-[#0C2340] text-white rounded-3xl p-6 sm:p-8 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
@@ -190,7 +213,7 @@ export const AdminDashboard: React.FC = () => {
                 <tbody className="divide-y divide-slate-100">
                   {bookings.map((bkg) => (
                     <tr key={bkg.id} className="hover:bg-slate-50/80 transition-colors">
-                      <td className="p-3.5 font-mono font-bold text-[#FF7A00]">
+                      <td className="p-3.5 font-mono font-bold text-[#0071E3]">
                         {bkg.referenceId}
                       </td>
                       <td className="p-3.5 font-semibold text-slate-800">
@@ -205,7 +228,7 @@ export const AdminDashboard: React.FC = () => {
                       </td>
                       <td className="p-3.5 font-extrabold text-slate-900">₹{bkg.totalPrice}</td>
                       <td className="p-3.5">
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-orange-100 text-[#FF7A00]">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-[#0071E3]">
                           {bkg.status.toUpperCase()}
                         </span>
                       </td>
@@ -303,7 +326,7 @@ export const AdminDashboard: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {services.map((srv) => (
               <div key={srv.id} className="bg-white p-5 rounded-3xl border border-slate-200 shadow-xs">
-                <span className="text-[10px] uppercase font-bold text-[#FF7A00] bg-orange-50 px-2 py-0.5 rounded-md">
+                <span className="text-[10px] uppercase font-bold text-[#0071E3] bg-blue-50 px-2 py-0.5 rounded-md">
                   {srv.category}
                 </span>
                 <h4 className="font-bold text-sm text-slate-900 mt-2">{srv.name}</h4>
@@ -331,7 +354,7 @@ export const AdminDashboard: React.FC = () => {
                     <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold">
                       {c.status}
                     </span>
-                    <span className="text-xs text-[#FF7A00]">Booking: {c.bookingRef}</span>
+                    <span className="text-xs text-[#0071E3]">Booking: {c.bookingRef}</span>
                   </div>
                   <h4 className="font-bold text-sm text-slate-900 mt-1">{c.customer}</h4>
                   <p className="text-xs text-slate-600 mt-0.5">{c.issue}</p>

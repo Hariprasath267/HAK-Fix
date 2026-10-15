@@ -15,6 +15,16 @@ import {
   generateBookingReference,
   getNextStatus,
 } from '../utils/bookingRules.ts';
+import {
+  auth,
+  onAuthStateChanged,
+  signInWithGoogle,
+  loginWithEmail,
+  signupWithEmail,
+  logoutUser,
+  FirebaseUser,
+} from '../lib/firebase.ts';
+import { pushHistory, popHistory, getBackLabel } from '../utils/navigationHistory.ts';
 
 export type ActivePage =
   | 'home'
@@ -37,10 +47,28 @@ interface Toast {
   message: string;
 }
 
+export interface FairFixDiagnosis {
+  issueTitle: string;
+  severity: 'routine' | 'urgent' | 'emergency';
+  confidence: number;
+  category: string;
+  diagnosisSummary: string;
+  requiredParts: Array<{ name: string; brand: string; mrp: number; lockedPrice: number }>;
+  laborCharge: number;
+  estimatedDurationMins: number;
+  antiSurpriseGuarantee: string;
+  vanPreStocked: boolean;
+}
+
 interface AppContextType {
   // Navigation & Page State
   currentPage: ActivePage;
   setCurrentPage: (page: ActivePage) => void;
+  pageHistory: ActivePage[];
+  goBack: () => void;
+  canGoBack: boolean;
+  previousPage: ActivePage | null;
+  getBackTitle: () => string;
   selectedProviderId: string | null;
   setSelectedProviderId: (id: string | null) => void;
   selectedBookingId: string | null;
@@ -61,6 +89,14 @@ interface AppContextType {
     role: UserRole;
   };
 
+  // Firebase Auth & Cloud SQL Sync
+  firebaseUser: FirebaseUser | null;
+  firebaseIdToken: string | null;
+  handleGoogleSignIn: () => Promise<void>;
+  handleEmailSignIn: (email: string, pass: string) => Promise<void>;
+  handleEmailSignUp: (email: string, pass: string, name: string) => Promise<void>;
+  handleSignOut: () => Promise<void>;
+
   // Data
   services: ServiceItem[];
   providers: Provider[];
@@ -80,9 +116,13 @@ interface AppContextType {
   sortBy: 'recommended' | 'rating' | 'price_asc' | 'price_desc';
   setSortBy: (sort: 'recommended' | 'rating' | 'price_asc' | 'price_desc') => void;
 
-  // Modals
+  // Modals & Flagship Features
   isAiFinderOpen: boolean;
   setIsAiFinderOpen: (open: boolean) => void;
+  isFairFixOpen: boolean;
+  setIsFairFixOpen: (open: boolean) => void;
+  fairFixDiagnosis: FairFixDiagnosis | null;
+  setFairFixDiagnosis: (diag: FairFixDiagnosis | null) => void;
   isAuthModalOpen: boolean;
   setIsAuthModalOpen: (open: boolean) => void;
   isBookingModalOpen: boolean;
@@ -101,7 +141,9 @@ interface AppContextType {
     city: string;
     problemDescription: string;
     isEmergency?: boolean;
-  }) => Booking;
+    lockedPrice?: number;
+    requiredParts?: Array<{ name: string; brand: string; lockedPrice: number }>;
+  }) => Promise<Booking>;
   updateBookingStatus: (bookingId: string, nextStatus: BookingStatus) => void;
   advanceBookingStatusDemo: (bookingId: string) => void;
   cancelBooking: (bookingId: string, reason: string) => boolean;
@@ -120,16 +162,44 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-const BOOKINGS_STORAGE_KEY = 'hakfix_bookings_v2';
-const PROVIDERS_STORAGE_KEY = 'hakfix_providers_v2';
+const BOOKINGS_STORAGE_KEY = 'hakfix_bookings_v3';
+const PROVIDERS_STORAGE_KEY = 'hakfix_providers_v3';
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentPage, setCurrentPage] = useState<ActivePage>('home');
+  const [currentPage, setCurrentPageState] = useState<ActivePage>('home');
+  const [pageHistory, setPageHistory] = useState<ActivePage[]>([]);
+
+  const setCurrentPage = (page: ActivePage) => {
+    setCurrentPageState((prevCurrent) => {
+      if (prevCurrent !== page) {
+        setPageHistory((prevHist) => pushHistory(prevHist, page, prevCurrent) as ActivePage[]);
+      }
+      return page;
+    });
+  };
+
+  const goBack = () => {
+    setPageHistory((prevHist) => {
+      const { previousPage: prevP, nextHistory } = popHistory(prevHist, 'home');
+      setCurrentPageState(prevP as ActivePage);
+      return nextHistory as ActivePage[];
+    });
+  };
+
+  const canGoBack = currentPage !== 'home' || pageHistory.length > 0;
+  const previousPage = (pageHistory.length > 0 ? pageHistory[pageHistory.length - 1] : (currentPage !== 'home' ? 'home' : null)) as ActivePage | null;
+  const getBackTitle = () => getBackLabel(previousPage || 'home');
+
   const [selectedProviderId, setSelectedProviderId] = useState<string | null>('pro-1');
   const [selectedBookingId, setSelectedBookingId] = useState<string | null>('bkg-1');
   const [selectedCategory, setSelectedCategory] = useState<ServiceCategory | null>(null);
   const [language, setLanguage] = useState<Language>('en');
   const [userRole, setUserRole] = useState<UserRole>('customer');
+
+  // Firebase Auth State
+  const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
+  const [firebaseIdToken, setFirebaseIdToken] = useState<string | null>(null);
+
   const [currentUser, setCurrentUser] = useState({
     id: 'cust-demo-1',
     name: 'Karthik Subramanian',
@@ -138,10 +208,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     role: 'customer' as UserRole,
   });
 
+  // Unique MVP Feature: HAK FairFix™ Anti-Surprise Price Lock Guarantee
+  const [isFairFixOpen, setIsFairFixOpen] = useState(false);
+  const [fairFixDiagnosis, setFairFixDiagnosis] = useState<FairFixDiagnosis | null>(null);
+
   // Services
   const [services] = useState<ServiceItem[]>(INITIAL_SERVICES);
 
-  // Providers with localStorage fallback
+  // Providers
   const [providers, setProviders] = useState<Provider[]>(() => {
     try {
       const saved = localStorage.getItem(PROVIDERS_STORAGE_KEY);
@@ -152,7 +226,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return INITIAL_PROVIDERS;
   });
 
-  // Bookings with localStorage fallback
+  // Bookings
   const [bookings, setBookings] = useState<Booking[]>(() => {
     try {
       const saved = localStorage.getItem(BOOKINGS_STORAGE_KEY);
@@ -169,9 +243,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [minRatingFilter, setMinRatingFilter] = useState(0);
   const [maxPriceFilter, setMaxPriceFilter] = useState(3000);
   const [availabilityFilter, setAvailabilityFilter] = useState<'all' | 'today'>('all');
-  const [sortBy, setSortBy] = useState<'recommended' | 'rating' | 'price_asc' | 'price_desc'>(
-    'recommended'
-  );
+  const [sortBy, setSortBy] = useState<'recommended' | 'rating' | 'price_asc' | 'price_desc'>('recommended');
 
   // Modals
   const [isAiFinderOpen, setIsAiFinderOpen] = useState(false);
@@ -193,6 +265,141 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setToasts((prev) => prev.filter((t) => t.id !== id));
   };
 
+  // Listen to Firebase Auth state
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      setFirebaseUser(user);
+      if (user) {
+        try {
+          const token = await user.getIdToken();
+          setFirebaseIdToken(token);
+
+          // Synchronize user to Cloud SQL PostgreSQL database
+          const res = await fetch('/api/auth/sync', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              name: user.displayName || user.email?.split('@')[0],
+              role: userRole,
+            }),
+          });
+
+          if (res.ok) {
+            const data = await res.json();
+            setCurrentUser({
+              id: user.uid,
+              name: data.user?.name || user.displayName || user.email?.split('@')[0] || 'Customer',
+              email: user.email || 'customer@hakfix.com',
+              phone: data.user?.phone || '9840123456',
+              role: (data.user?.role as UserRole) || 'customer',
+            });
+          }
+
+          // Fetch user's bookings from Cloud SQL
+          const profileRes = await fetch('/api/user/profile', {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          if (profileRes.ok) {
+            const profileData = await profileRes.json();
+            if (profileData.bookings && profileData.bookings.length > 0) {
+              const mappedSqlBookings: Booking[] = profileData.bookings.map((sb: any) => ({
+                id: `sql-${sb.id}`,
+                referenceId: sb.bookingReference,
+                customerId: user.uid,
+                customerName: sb.customerName,
+                customerPhone: sb.customerPhone,
+                customerEmail: sb.customerEmail,
+                address: sb.customerAddress,
+                city: 'Chennai',
+                pinCode: '600040',
+                providerId: sb.providerId || 'pro-1',
+                providerName: sb.providerName || 'Certified HAK Specialist',
+                providerPhone: '+91 98401 23456',
+                providerPhoto: 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=200&auto=format&fit=crop&q=80',
+                category: sb.serviceCategory as ServiceCategory,
+                serviceId: 'fairfix-1',
+                serviceName: sb.serviceName,
+                date: sb.scheduledDate,
+                timeSlot: sb.scheduledTime,
+                problemDescription: sb.notes || 'HAK FairFix™ Guaranteed Price Lock',
+                estimatedPrice: sb.basePrice,
+                taxAmount: sb.taxAmount || 0,
+                totalPrice: sb.totalPrice,
+                status: (sb.status as BookingStatus) || 'accepted',
+                createdAt: sb.createdAt,
+                updatedAt: sb.createdAt,
+              }));
+
+              setBookings((prev) => {
+                const existingRefs = new Set(prev.map((b) => b.referenceId));
+                const newItems = mappedSqlBookings.filter((b) => !existingRefs.has(b.referenceId));
+                return [...newItems, ...prev];
+              });
+            }
+          }
+        } catch (err) {
+          console.warn('Failed to sync auth with Cloud SQL:', err);
+        }
+      } else {
+        setFirebaseIdToken(null);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [userRole]);
+
+  // Auth Handlers
+  const handleGoogleSignIn = async () => {
+    try {
+      const user = await signInWithGoogle();
+      showToast(`Welcome, ${user.displayName || 'Customer'}! Signed in with Google.`, 'success');
+      setIsAuthModalOpen(false);
+    } catch (error: any) {
+      showToast(error.message || 'Google Sign-In failed. Please try again.', 'error');
+    }
+  };
+
+  const handleEmailSignIn = async (email: string, pass: string) => {
+    try {
+      const user = await loginWithEmail(email, pass);
+      showToast(`Welcome back, ${user.displayName || email.split('@')[0]}!`, 'success');
+      setIsAuthModalOpen(false);
+    } catch (error: any) {
+      showToast(error.message || 'Invalid email or password.', 'error');
+    }
+  };
+
+  const handleEmailSignUp = async (email: string, pass: string, name: string) => {
+    try {
+      const user = await signupWithEmail(email, pass, name);
+      showToast(`Account created successfully! Welcome, ${name || email.split('@')[0]}!`, 'success');
+      setIsAuthModalOpen(false);
+    } catch (error: any) {
+      showToast(error.message || 'Account registration failed.', 'error');
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await logoutUser();
+      setCurrentUser({
+        id: 'guest',
+        name: 'Guest Customer',
+        email: 'guest@hakfix.com',
+        phone: '',
+        role: 'customer',
+      });
+      showToast('Signed out of HAK fix account.', 'info');
+    } catch (error: any) {
+      showToast('Sign out error', 'error');
+    }
+  };
+
   // Sync to localStorage
   useEffect(() => {
     try {
@@ -210,37 +417,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, [providers]);
 
-  // Update current user when role toggles for demo convenience
-  useEffect(() => {
-    if (userRole === 'provider') {
-      setCurrentUser({
-        id: 'pro-1',
-        name: 'Suresh Kumar',
-        email: 'suresh.fix@hakfix.in',
-        phone: '+91 98401 23456',
-        role: 'provider',
-      });
-    } else if (userRole === 'admin') {
-      setCurrentUser({
-        id: 'admin-1',
-        name: 'Admin Desk (HAK fix)',
-        email: 'admin@hakfix.in',
-        phone: '+91 98888 77777',
-        role: 'admin',
-      });
-    } else {
-      setCurrentUser({
-        id: 'cust-demo-1',
-        name: 'Karthik Subramanian',
-        email: 'karthik.sub@gmail.com',
-        phone: '9840123456',
-        role: 'customer',
-      });
-    }
-  }, [userRole]);
-
-  // Booking Creation
-  const createNewBooking = (params: {
+  // Booking Creation with Cloud SQL insertion
+  const createNewBooking = async (params: {
     serviceId: string;
     providerId: string;
     date: string;
@@ -252,11 +430,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     city: string;
     problemDescription: string;
     isEmergency?: boolean;
-  }): Booking => {
+    lockedPrice?: number;
+    requiredParts?: Array<{ name: string; brand: string; lockedPrice: number }>;
+  }): Promise<Booking> => {
     const service = services.find((s) => s.id === params.serviceId) || services[0];
     const provider = providers.find((p) => p.id === params.providerId) || providers[0];
     const pricing = calculatePricing(service.basePrice, params.isEmergency, true);
     const referenceId = generateBookingReference();
+
+    const finalTotalPrice = params.lockedPrice || pricing.totalPrice;
 
     const newBooking: Booking = {
       id: `bkg-${Date.now()}`,
@@ -280,15 +462,48 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       problemDescription: params.problemDescription,
       estimatedPrice: pricing.basePrice,
       taxAmount: pricing.taxAmount,
-      totalPrice: pricing.totalPrice,
-      status: 'pending',
+      totalPrice: finalTotalPrice,
+      status: 'accepted',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
 
     setBookings((prev) => [newBooking, ...prev]);
     setSelectedBookingId(newBooking.id);
-    showToast(`Booking ${referenceId} confirmed! Status is currently Pending.`, 'success');
+
+    // Persist to Cloud SQL PostgreSQL
+    try {
+      await fetch('/api/bookings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(firebaseIdToken ? { Authorization: `Bearer ${firebaseIdToken}` } : {}),
+        },
+        body: JSON.stringify({
+          bookingReference: referenceId,
+          userUid: firebaseUser?.uid || null,
+          customerName: params.customerName,
+          customerEmail: currentUser.email,
+          customerPhone: params.customerPhone,
+          customerAddress: `${params.address}, ${params.city || 'Chennai'} - ${params.pinCode}`,
+          serviceCategory: service.category,
+          serviceName: service.name,
+          providerId: provider.id,
+          providerName: provider.name,
+          scheduledDate: params.date,
+          scheduledTime: params.timeSlot,
+          basePrice: pricing.basePrice,
+          emergencyFee: pricing.emergencyFee,
+          taxAmount: pricing.taxAmount,
+          totalPrice: finalTotalPrice,
+          notes: params.problemDescription,
+        }),
+      });
+    } catch (err) {
+      console.warn('Booking saved to local state, backend sync failed:', err);
+    }
+
+    showToast(`Booking ${referenceId} confirmed with FairFix™ Price Lock!`, 'success');
     return newBooking;
   };
 
@@ -350,7 +565,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       prev.map((b) => (b.id === bookingId ? { ...b, review: reviewObj } : b))
     );
 
-    // Also update provider rating and review list
     setProviders((prev) =>
       prev.map((p) => {
         if (p.id === booking.providerId) {
@@ -425,6 +639,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       value={{
         currentPage,
         setCurrentPage,
+        pageHistory,
+        goBack,
+        canGoBack,
+        previousPage,
+        getBackTitle,
         selectedProviderId,
         setSelectedProviderId,
         selectedBookingId,
@@ -436,6 +655,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         userRole,
         setUserRole,
         currentUser,
+        firebaseUser,
+        firebaseIdToken,
+        handleGoogleSignIn,
+        handleEmailSignIn,
+        handleEmailSignUp,
+        handleSignOut,
         services,
         providers,
         bookings,
@@ -453,6 +678,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setSortBy,
         isAiFinderOpen,
         setIsAiFinderOpen,
+        isFairFixOpen,
+        setIsFairFixOpen,
+        fairFixDiagnosis,
+        setFairFixDiagnosis,
         isAuthModalOpen,
         setIsAuthModalOpen,
         isBookingModalOpen,
