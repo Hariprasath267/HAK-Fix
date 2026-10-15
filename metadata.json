@@ -1,0 +1,6 @@
+{
+  "name": "HAK Fix - Modern Local Service Booking",
+  "description": "Local Experts. Easy Bookings. Trusted Service. Discover, compare, and book verified local service professionals with instant scheduling and live tracking.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

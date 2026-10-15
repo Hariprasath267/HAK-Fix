@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 180" width="100%" height="100%" fill="none">
+  <!-- HAK fix Official Logo -->
+  <g id="HAK">
+    <!-- H -->
+    <!-- Left bar -->
+    <rect x="20" y="38" width="26" height="122" rx="5" fill="#0C2340"/>
+    <!-- Right bar -->
+    <rect x="84" y="38" width="26" height="122" rx="5" fill="#0C2340"/>
+    <!-- Crossbar -->
+    <rect x="46" y="86" width="38" height="26" fill="#0C2340"/>
+
+    <!-- A (House shape) -->
+    <path d="M 136 160 
+             L 136 78 
+             L 178 36 
+             L 220 78 
+             L 220 160 
+             L 194 160 
+             L 194 98 
+             L 178 82 
+             L 162 98 
+             L 162 160 
+             Z" 
+          fill="#0C2340" 
+          stroke="#0C2340" 
+          stroke-width="2" 
+          stroke-linejoin="round"/>
+    
+    <!-- 4 Orange Window Panes in House -->
+    <rect x="167" y="112" width="9" height="9" rx="1.5" fill="#FF7A00"/>
+    <rect x="180" y="112" width="9" height="9" rx="1.5" fill="#FF7A00"/>
+    <rect x="167" y="125" width="9" height="9" rx="1.5" fill="#FF7A00"/>
+    <rect x="180" y="125" width="9" height="9" rx="1.5" fill="#FF7A00"/>
+
+    <!-- K -->
+    <!-- Vertical stem -->
+    <rect x="238" y="38" width="26" height="122" rx="5" fill="#0C2340"/>
+    <!-- Upper diagonal branch -->
+    <polygon points="264,112 308,38 338,38 284,124" fill="#0C2340"/>
+    <!-- Lower diagonal branch -->
+    <polygon points="274,104 314,160 344,160 292,94" fill="#0C2340"/>
+  </g>
+
+  <!-- fix -->
+  <g id="fix" fill="#FF7A00">
+    <!-- f -->
+    <path d="M 374 38 
+             C 362 38 354 46 354 58 
+             L 354 160 
+             L 378 160 
+             L 378 94 
+             L 396 94 
+             L 396 74 
+             L 378 74 
+             L 378 58 
+             C 378 54 380 52 384 52 
+             L 394 52 
+             L 394 38 
+             Z" 
+          fill="#FF7A00"/>
+    <!-- f crossbar extension -->
+    <rect x="344" y="74" width="20" height="20" rx="3" fill="#FF7A00"/>
+
+    <!-- i -->
+    <!-- Dot -->
+    <circle cx="418" cy="48" r="11" fill="#FF7A00"/>
+    <!-- Stem -->
+    <rect x="406" y="74" width="24" height="86" rx="5" fill="#FF7A00"/>
+
+    <!-- x with open wrench head on top right -->
+    <!-- Main crossing diagonal from top-left to bottom-right -->
+    <polygon points="440,74 462,74 520,160 498,160" fill="#FF7A00"/>
+    <!-- Lower left diagonal arm -->
+    <polygon points="468,114 442,154 442,160 464,160 484,130" fill="#FF7A00"/>
+    
+    <!-- Upper right arm with wrench head -->
+    <!-- Connecting arm -->
+    <polygon points="486,112 506,90 518,102 498,124" fill="#FF7A00"/>
+    <!-- Stylized Wrench Head at (526, 68) -->
+    <path d="M 505 78
+             C 502 68 506 56 516 48
+             C 527 39 542 41 550 51
+             C 554 56 555 63 553 69
+             L 540 60
+             C 536 57 530 58 526 62
+             C 522 66 523 72 527 76
+             L 538 88
+             C 532 90 525 89 519 86
+             Z" 
+          fill="#FF7A00"/>
+  </g>
+</svg>
